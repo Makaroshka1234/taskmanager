@@ -22,7 +22,7 @@ export default function Header() {
                 variant="default"
                 size="default"
               >
-                Login
+                <Link href="/login">login</Link>
               </Button>
               <Button
                 asChild
