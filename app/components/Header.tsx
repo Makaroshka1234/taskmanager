@@ -1,11 +1,13 @@
+"use client";
 import Image from "next/image";
 import HeaderList from "./HeaderList";
 import { Button } from "@/schadComponents/ui/button";
 import { User } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "../context/AuthProvider";
 
 export default function Header() {
-  const isLoggined = false;
+  const { user } = useAuth();
   const navList: string[] = ["Info", "Profile", "About"];
   return (
     <header className="bg-black text-amber-50">
@@ -13,7 +15,7 @@ export default function Header() {
         <Image src="/vercel.svg" alt="logo" width={50} height={50} />
         <div className="flex gap-5 items-center">
           <HeaderList navList={navList} />
-          {isLoggined ? (
+          {user ? (
             <User />
           ) : (
             <div className="header_btn-block flex gap-3 justify-center items-center">

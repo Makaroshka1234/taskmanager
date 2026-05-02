@@ -42,15 +42,17 @@ function AuthForm(props: AuthFormP) {
         email: values.email,
         password: values.password,
       }),
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
-    const result = await res.json();
-
     if (res.ok) {
-      localStorage.setItem("token", result.token);
       router.push("/profile");
     } else {
-      console.log(result.error);
+      const data = await res.json();
+      console.log(data.error);
     }
   };
 

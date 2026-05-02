@@ -42,7 +42,7 @@ export async function POST(req: Request) {
   const token = jwt.sign(
     { userId: user.id, email: user.email },
     process.env.JWT_SECRET!,
-    { expiresIn: "7d" }
+    { expiresIn: "7d" },
   );
 
   return NextResponse.json(
@@ -54,6 +54,11 @@ export async function POST(req: Request) {
         email: user.email,
       },
     },
-    { status: 201 },
+    {
+      status: 201,
+      headers: {
+        "Set-Cookie": `token=${token}; HttpOnly; Path=/; Max-Age=604800; SameSite=Lax`,
+      },
+    },
   );
 }
