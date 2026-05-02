@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/schadComponents/ui/button";
 import {
   Card,
@@ -8,9 +9,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/schadComponents/ui/card";
+
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
   FieldSet,
@@ -19,10 +22,46 @@ import {
 import { Input } from "@/schadComponents/ui/input";
 import Link from "next/link";
 import { AuthFormP } from "../types/auth";
+import { Controller, useForm } from "react-hook-form";
+import {
+  registerSchema,
+  TypeRegisterSchema,
+} from "../api/schemas/register.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 
 function AuthForm(props: AuthFormP) {
   const { type } = props;
   const isLoginForm = type === "Login";
+  const router = useRouter();
+
+  const onRegSubmit = async (values: TypeRegisterSchema) => {
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      body: JSON.stringify({
+        email: values.email,
+        password: values.password,
+      }),
+    });
+
+    const result = await res.json();
+
+    if (res.ok) {
+      localStorage.setItem("token", result.token);
+      router.push("/profile");
+    } else {
+      console.log(result.error);
+    }
+  };
+
+  const form = useForm<TypeRegisterSchema>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    mode: "onChange",
+  });
 
   return (
     <div className="container">
@@ -44,17 +83,44 @@ function AuthForm(props: AuthFormP) {
           </CardAction>
         </CardHeader>
         <CardContent>
-          <form action="" id="auth-form">
+          <form onSubmit={form.handleSubmit(onRegSubmit)} id="auth-form">
             <FieldSet>
               <FieldGroup>
-                <Field>
-                  <FieldLabel htmlFor="email">Email</FieldLabel>
-                  <Input id="email" placeholder="example@google.com" />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <Input id="password" type="password" />
-                </Field>
+                <Controller
+                  name="email"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor="email">Email</FieldLabel>
+                      <Input
+                        {...field}
+                        id="email"
+                        placeholder="example@google.com"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="password"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor="password">Password</FieldLabel>
+                      <Input
+                        aria-invalid={fieldState.invalid}
+                        {...field}
+                        id="password"
+                        type="password"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
               </FieldGroup>
             </FieldSet>
           </form>
