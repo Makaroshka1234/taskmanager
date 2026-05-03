@@ -11,8 +11,8 @@ import { UserModel } from "@/generated/prisma/models";
 
 type AuthContextType = {
   user: UserModel | null;
-  setUser: React.Dispatch<React.SetStateAction<UserModel | null>>;
   loading: boolean;
+  refreshUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -25,37 +25,48 @@ export function AuthProvider({ children }: Props) {
   const [user, setUser] = useState<UserModel | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch("/api/auth/me", {
-          credentials: "include",
-        });
+  // 🔥 єдина функція для отримання юзера
+  const refreshUser = async () => {
+    try {
+      const res = await fetch("/api/auth/me", {
+        credentials: "include",
+      });
 
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data.user);
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
+      if (!res.ok) {
         setUser(null);
-      } finally {
-        setLoading(false);
+        return;
       }
+
+      const data = await res.json().catch(() => null);
+
+      if (data?.user) {
+        setUser(data.user);
+      } else {
+        setUser(null);
+      }
+    } catch {
+      setUser(null);
+    }
+  };
+
+  // 🔥 ініціалізація при старті апки
+  useEffect(() => {
+    const init = async () => {
+      await refreshUser();
+      setLoading(false);
     };
 
-    checkAuth();
+    init();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loading }}>
+    <AuthContext.Provider value={{ user, loading, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-// 🔥 safe hook
+// 🔥 безпечний хук
 export const useAuth = () => {
   const context = useContext(AuthContext);
 

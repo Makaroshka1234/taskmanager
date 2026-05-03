@@ -29,11 +29,13 @@ import {
 } from "../api/schemas/register.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../context/AuthProvider";
 
 function AuthForm(props: AuthFormP) {
   const { type } = props;
   const isLoginForm = type === "Login";
   const router = useRouter();
+  const { refreshUser } = useAuth();
 
   const onRegSubmit = async (values: TypeRegisterSchema) => {
     const res = await fetch("/api/auth/register", {
@@ -49,6 +51,27 @@ function AuthForm(props: AuthFormP) {
     });
 
     if (res.ok) {
+      router.push("/profile");
+    } else {
+      const data = await res.json();
+      console.log(data.error);
+    }
+  };
+  const onLoginSubmit = async (values: TypeRegisterSchema) => {
+    const res = await fetch("api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({
+        email: values.email,
+        password: values.password,
+      }),
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (res.ok) {
+      await refreshUser();
       router.push("/profile");
     } else {
       const data = await res.json();
@@ -85,7 +108,12 @@ function AuthForm(props: AuthFormP) {
           </CardAction>
         </CardHeader>
         <CardContent>
-          <form onSubmit={form.handleSubmit(onRegSubmit)} id="auth-form">
+          <form
+            onSubmit={form.handleSubmit(
+              isLoginForm ? onLoginSubmit : onRegSubmit,
+            )}
+            id="auth-form"
+          >
             <FieldSet>
               <FieldGroup>
                 <Controller

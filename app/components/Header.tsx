@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useAuth } from "../context/AuthProvider";
 
 export default function Header() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navList: string[] = ["Info", "Profile", "About"];
   return (
     <header className="bg-black text-amber-50">
@@ -15,7 +15,9 @@ export default function Header() {
         <Image src="/vercel.svg" alt="logo" width={50} height={50} />
         <div className="flex gap-5 items-center">
           <HeaderList navList={navList} />
-          {user ? (
+          {loading ? (
+            <div className="flex gap-3">Loading...</div>
+          ) : user ? (
             <User />
           ) : (
             <div className="header_btn-block flex gap-3 justify-center items-center">
@@ -26,6 +28,7 @@ export default function Header() {
               >
                 <Link href="/login">login</Link>
               </Button>
+
               <Button
                 asChild
                 className="bg-transparent border border-white text-white cursor-pointer hover:bg-white hover:text-black transition"

@@ -11,7 +11,7 @@ export function middleware(req: NextRequest) {
 
   // 🔴 якщо НЕ залогінений і йде на profile
   if (isProtectedPage && !token) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/     ", req.url));
   }
 
   // 🔥 якщо ЗАЛОГІНЕНИЙ і йде на login/register
