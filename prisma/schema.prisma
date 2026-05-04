@@ -6,11 +6,70 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+enum MemberRole {
+  OWNER
+  ADMIN
+  MEMBER  
+}
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
+model User{
+  id String @id @default(uuid())
+  email String @unique
+  password String
+  boards Board[] 
+
+memberships BoardMember[]
+
+created_at DateTime @default(now())
+updated_at DateTime @updatedAt 
+}
+model Board{
+id String @id @default(uuid())
+title String
+creator User @relation(fields: [creatorId], references: [id])
+creatorId String
+members BoardMember[]
+boardLists BoardList[]
+created_at DateTime @default(now())
+
   
-  createdAt DateTime @default(now())
+} 
+
+model BoardMember{
+  id String @id @default(uuid())
+  userId String
+  boardId String
+  role MemberRole
+ user User @relation(fields: [userId],references: [id])
+ board Board @relation(fields: [boardId],references: [id])
+
+
+created_at DateTime @default(now())
+
+}
+
+model BoardList{
+id String @id @default(uuid())
+title String
+tasks Task[]
+boardId String
+created_at DateTime @default(now())
+board Board @relation(fields: [boardId],references: [id])
+
+}
+model Task{
+ id String @id @default(uuid())
+ title String
+ priority Priority
+ boardListId String
+ 
+ boardList BoardList @relation(fields: [boardListId],references: [id])
+
+ created_at DateTime @default(now())
+
 }

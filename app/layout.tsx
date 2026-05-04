@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "./components/Header";
 import { cn } from "@/lib/utils";
 import { AuthProvider } from "./context/AuthProvider";
+import Footer from "./components/Footer";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -39,10 +40,12 @@ export default function RootLayout({
         inter.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-screen flex flex-col">
         <AuthProvider>
           <Header />
-          {children}
+          <main className="flex-1 flex flex-col overflow-hidden">
+            {children}
+          </main>
         </AuthProvider>
       </body>
     </html>

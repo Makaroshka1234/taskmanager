@@ -38,25 +38,28 @@ function AuthForm(props: AuthFormP) {
   const { refreshUser } = useAuth();
 
   const onRegSubmit = async (values: TypeRegisterSchema) => {
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      body: JSON.stringify({
-        email: values.email,
-        password: values.password,
-      }),
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
 
-    if (res.ok) {
-      router.push("/profile");
-    } else {
       const data = await res.json();
-      console.log(data.error);
+
+      if (!res.ok) {
+        console.log(data.error);
+        return;
+      }
+      await refreshUser();
+      router.push("/profile");
+    } catch (err) {
+      console.log("Network error", err);
     }
   };
+
   const onLoginSubmit = async (values: TypeRegisterSchema) => {
     const res = await fetch("api/auth/login", {
       method: "POST",

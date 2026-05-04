@@ -6,17 +6,10 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
+    const token = cookieStore.get("accessToken")?.value;
 
     if (!token) {
-      return NextResponse.json(
-        {
-          error: "Not authenicadet",
-        },
-        {
-          status: 401,
-        },
-      );
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
@@ -25,32 +18,23 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
+      include: {
+        boards: true,
+      },
     });
 
     if (!user) {
-      return NextResponse.json(
-        {
-          erorr: "User not found",
-        },
-        {
-          status: 404,
-        },
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+
     return NextResponse.json({
       user: {
-        id: user?.id,
-        email: user?.email,
+        id: user.id,
+        email: user.email,
+        boards: user.boards,
       },
     });
   } catch {
-    return NextResponse.json(
-      {
-        erorr: "Unauthorized",
-      },
-      {
-        status: 401,
-      },
-    );
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 }

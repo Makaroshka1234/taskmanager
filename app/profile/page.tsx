@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthProvider";
 import { useRouter } from "next/navigation";
 import { Button } from "@/schadComponents/ui/button";
+import BoardList from "@/app/components/BoardList/BoardList";
 
 function ProfilePage() {
   const { user, loading, refreshUser } = useAuth();
@@ -15,10 +16,6 @@ function ProfilePage() {
       router.push("/login");
     }
   }, [user, loading]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   if (!user) {
     return null; // поки редіректиться
@@ -36,17 +33,10 @@ function ProfilePage() {
   };
 
   return (
-    <div className="max-w-3xs">
-      <p>{user.email}</p>
-      <Button
-        size={"default"}
-        type="button"
-        variant={"destructive"}
-        onClick={logout}
-      >
-        Logout
-      </Button>
-    </div>
+    <>
+      <BoardList title="Your Board's" />
+      <BoardList title="Invited boards  " />
+    </>
   );
 }
 

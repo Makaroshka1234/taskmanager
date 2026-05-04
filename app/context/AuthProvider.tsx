@@ -1,5 +1,6 @@
 "use client";
 
+import { Prisma } from "@/generated/prisma/client";
 import {
   createContext,
   ReactNode,
@@ -7,10 +8,16 @@ import {
   useEffect,
   useState,
 } from "react";
-import { UserModel } from "@/generated/prisma/models";
+
+type UserWithRelations = Prisma.UserGetPayload<{
+  include: {
+    boards: true;
+    memberships: true;
+  };
+}>;
 
 type AuthContextType = {
-  user: UserModel | null;
+  user: UserWithRelations | null;
   loading: boolean;
   refreshUser: () => Promise<void>;
 };
@@ -22,10 +29,9 @@ type Props = {
 };
 
 export function AuthProvider({ children }: Props) {
-  const [user, setUser] = useState<UserModel | null>(null);
+  const [user, setUser] = useState<UserWithRelations | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔥 єдина функція для отримання юзера
   const refreshUser = async () => {
     try {
       const res = await fetch("/api/auth/me", {
@@ -37,19 +43,16 @@ export function AuthProvider({ children }: Props) {
         return;
       }
 
-      const data = await res.json().catch(() => null);
+      const data = await res.json();
 
-      if (data?.user) {
-        setUser(data.user);
-      } else {
-        setUser(null);
-      }
-    } catch {
+      setUser(data?.user ?? null);
+      console.log("NEW USER:", data.user);
+    } catch (err) {
+      console.error("refreshUser error:", err);
       setUser(null);
     }
   };
 
-  // 🔥 ініціалізація при старті апки
   useEffect(() => {
     const init = async () => {
       await refreshUser();
@@ -66,7 +69,6 @@ export function AuthProvider({ children }: Props) {
   );
 }
 
-// 🔥 безпечний хук
 export const useAuth = () => {
   const context = useContext(AuthContext);
 

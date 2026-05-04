@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 export async function POST(req: Request) {
   const { email, password } = await req.json();
+  const res = NextResponse.json({ message: "Logged in" });
 
   if (!email || !password) {
     return NextResponse.json(
@@ -35,20 +36,30 @@ export async function POST(req: Request) {
       },
     );
   }
-  const token = jwt.sign(
-    { userId: findUser.id, userEmail: findUser.email },
+  const accessToken = jwt.sign(
+    { userId: findUser.id },
     process.env.JWT_SECRET!,
+    { expiresIn: "15m" },
+  );
+
+  const refreshToken = jwt.sign(
+    { userId: findUser.id },
+    process.env.JWT_REFRESH_SECRET!,
     { expiresIn: "7d" },
   );
-  return NextResponse.json(
-    {
-      message: "Logged in ",
-    },
-    {
-      headers: {
-        "Set-Cookie": `token=${token}; HttpOnly; Path=/; Max-Age=604800; SameSite=Lax`,
-      },
-      status: 200,
-    },
-  );
+
+  res.cookies.set("accessToken", accessToken, {
+    httpOnly: true,
+    path: "/",
+    maxAge: 60 * 15, // 15 хв
+    sameSite: "lax",
+  });
+
+  res.cookies.set("refreshToken", refreshToken, {
+    httpOnly: true,
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7, // 7 днів
+    sameSite: "lax",
+  });
+  return res;
 }
