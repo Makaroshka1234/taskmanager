@@ -29,17 +29,19 @@ import {
 } from "../api/schemas/register.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../context/AuthProvider";
+import { apiFetch } from "../utils/apiFetch";
+import { useUserStore } from "../store/useUserStore";
 
 function AuthForm(props: AuthFormP) {
   const { type } = props;
   const isLoginForm = type === "Login";
   const router = useRouter();
-  const { refreshUser } = useAuth();
+
+  const setUser = useUserStore((s) => s.setUser);
 
   const onRegSubmit = async (values: TypeRegisterSchema) => {
     try {
-      const res = await fetch("/api/auth/register", {
+      const res = await apiFetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -53,7 +55,7 @@ function AuthForm(props: AuthFormP) {
         console.log(data.error);
         return;
       }
-      await refreshUser();
+      setUser(data.user);
       router.push("/profile");
     } catch (err) {
       console.log("Network error", err);
@@ -61,12 +63,12 @@ function AuthForm(props: AuthFormP) {
   };
 
   const onLoginSubmit = async (values: TypeRegisterSchema) => {
-    const res = await fetch("api/auth/login", {
+    const res = await apiFetch("api/auth/login", {
       method: "POST",
       body: JSON.stringify({
         email: values.email,
         password: values.password,
-      }),
+      }), 
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
@@ -74,7 +76,8 @@ function AuthForm(props: AuthFormP) {
     });
 
     if (res.ok) {
-      await refreshUser();
+      const data = await res.json();
+      setUser(data.user);
       router.push("/profile");
     } else {
       const data = await res.json();

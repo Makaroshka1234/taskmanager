@@ -18,6 +18,22 @@ export async function POST(req: Request) {
     data: {
       title: title,
       creatorId: user.userId,
+      boardLists: {
+        create: [
+          {
+            title: "To Do",
+          },
+          {
+            title: "In Progress",
+          },
+          {
+            title: "Done",
+          },
+        ],
+      },
+    },
+    include: {
+      boardLists: true,
     },
   });
 

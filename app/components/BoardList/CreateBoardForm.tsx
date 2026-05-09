@@ -1,5 +1,6 @@
 import { createBoardSchema } from "@/app/api/schemas/createboard.schema";
-import { useAuth } from "@/app/context/AuthProvider";
+import { apiFetch } from "@/app/utils/apiFetch";
+
 import { Button } from "@/schadComponents/ui/button";
 import {
   Dialog,
@@ -15,8 +16,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 
 function CreateBoardForm() {
-  const { refreshUser } = useAuth();
-
   const form = useForm<createBoardSchema>({
     resolver: zodResolver(createBoardSchema),
     defaultValues: {
@@ -26,7 +25,7 @@ function CreateBoardForm() {
   });
 
   async function CreateBoardFormSubmit(data: createBoardSchema) {
-    await fetch("/api/board/create", {
+    await apiFetch("/api/board/create", {
       method: "POST",
       credentials: "include",
       headers: {
@@ -34,7 +33,7 @@ function CreateBoardForm() {
       },
       body: JSON.stringify(data),
     });
-    await refreshUser();
+
     console.log("AFTER REFRESH");
   }
   return (

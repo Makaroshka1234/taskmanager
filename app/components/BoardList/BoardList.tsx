@@ -1,15 +1,16 @@
 "use client";
-import { useAuth } from "@/app/context/AuthProvider";
+
 import BoardListItem from "./BoardListItem";
 import { Board } from "@/generated/prisma/client";
 import CreateBoard from "./CreateBoard";
+import { useUserStore } from "@/app/store/useUserStore";
 
 export interface IBoardList {
   title: string;
 }
 
 export default function BoardList(props: IBoardList) {
-  const { user } = useAuth();
+  const { user, isLoading } = useUserStore();
 
   const userBoards = user?.boards;
   console.log(userBoards);
@@ -20,10 +21,14 @@ export default function BoardList(props: IBoardList) {
       <h2 className="font-bold ">{title}</h2>
       <ul className="board-list flex gap-4 py-2 px-2 w-full overflow-x-auto ">
         {userBoards?.map((board: Board) => (
-          <BoardListItem key={board.id} boardTitle={board.title} />
+          <BoardListItem
+            key={board.id}
+            boardTitle={board.title}
+            id={board.id}
+          />
         ))}
 
-        <CreateBoard  />
+        <CreateBoard />
       </ul>
     </div>
   );
