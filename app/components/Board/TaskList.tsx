@@ -5,6 +5,7 @@ import {
   CardTitle,
 } from "@/schadComponents/ui/card";
 import TaskListItem from "./TaskListItem";
+import AddTaskListItem from "./AddTaskListItem";
 
 type BoardList = {
   id: string;
@@ -18,18 +19,17 @@ type Task = {
 };
 
 function TaskList(props: BoardList) {
-  const { tasks, title } = props;
+  const { tasks, title, id } = props;
   return (
-    <Card size="default" className="w-md">
+    <Card size="default" className="min-w-sm max-w-md">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
-        {tasks.length === 0 ? (
-          <p>create task</p>
-        ) : (
-          tasks?.map((task) => <TaskListItem key={task.id} />)
-        )}
+        {tasks?.map((task) => (
+          <TaskListItem key={task.id} {...task} />
+        ))}
+        <AddTaskListItem boardListId={id} />
       </CardContent>
     </Card>
   );

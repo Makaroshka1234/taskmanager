@@ -23,10 +23,7 @@ import { Input } from "@/schadComponents/ui/input";
 import Link from "next/link";
 import { AuthFormP } from "../types/auth";
 import { Controller, useForm } from "react-hook-form";
-import {
-  registerSchema,
-  TypeRegisterSchema,
-} from "../api/schemas/register.schema";
+import { registerSchema, TypeRegisterSchema } from "../schemas/register.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "../utils/apiFetch";
@@ -68,7 +65,7 @@ function AuthForm(props: AuthFormP) {
       body: JSON.stringify({
         email: values.email,
         password: values.password,
-      }), 
+      }),
       credentials: "include",
       headers: {
         "Content-Type": "application/json",

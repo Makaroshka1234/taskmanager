@@ -1,5 +1,6 @@
 "use client";
 
+import CreateTaskList from "./CreateTaskList/CreateTaskList";
 import TaskList from "./TaskList";
 import { useBoard } from "@/app/hooks/useBoard";
 
@@ -13,10 +14,13 @@ function Board(props: IBoardprops) {
   if (error) return <div>Error</div>;
   if (!board) return null;
   return (
-    <section className="board flex gap-3">
-      {board.boardLists.map((list) => (
-        <TaskList key={list.id} {...list} />
-      ))}
+    <section className="board ">
+      <ul className="flex gap-3"  >
+        {board.boardLists.map((list) => (
+          <TaskList key={list.id} {...list} />
+        ))}
+        <CreateTaskList boardId={id} />
+      </ul>
     </section>
   );
 }

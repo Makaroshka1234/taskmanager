@@ -66,6 +66,7 @@ model Task{
  id String @id @default(uuid())
  title String
  priority Priority
+ completed Boolean
  boardListId String
  
  boardList BoardList @relation(fields: [boardListId],references: [id])

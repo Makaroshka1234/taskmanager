@@ -3,11 +3,21 @@ import { Plus } from "lucide-react";
 import EditListItemPopUp from "./EditListItemPopUp";
 import { Button } from "@/schadComponents/ui/button";
 
-function TaskListItem() {
+interface TaskListItemProps {
+  id: string;
+  title: string;
+  priority: string;
+}
+
+function TaskListItem(props: TaskListItemProps) {
+  const { title, priority } = props;
   return (
-    <EditListItemPopUp>
-      <Button>kfsdfskffskdfdj</Button>
-    </EditListItemPopUp>
+    <>
+      <EditListItemPopUp>
+        <Button>{title}</Button>
+      </EditListItemPopUp>
+      <p>{priority}</p>
+    </> 
   );
 }
 
