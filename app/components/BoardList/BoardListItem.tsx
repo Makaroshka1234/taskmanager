@@ -7,6 +7,7 @@ import {
 import BoardListMemberList from "./BoardListMemberList";
 import { CircleArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import DeleteDropDown from "./DeleteDropDown";
 
 export interface IBoardListItem {
   id: string;
@@ -26,6 +27,7 @@ function BoardListItem(props: IBoardListItem) {
       <Card>
         <CardHeader>
           <CardTitle>{boardTitle}</CardTitle>
+          
         </CardHeader>
         <CardContent className="flex items-center justify-between">
           <BoardListMemberList />

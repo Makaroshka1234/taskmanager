@@ -6,6 +6,7 @@ import {
 } from "@/schadComponents/ui/card";
 import TaskListItem from "./TaskListItem";
 import AddTaskListItem from "./AddTaskListItem";
+import DeleteDropDown from "../BoardList/DeleteDropDown";
 
 type BoardList = {
   id: string;
@@ -22,8 +23,9 @@ function TaskList(props: BoardList) {
   const { tasks, title, id } = props;
   return (
     <Card size="default" className="min-w-sm max-w-md">
-      <CardHeader>
+      <CardHeader className="flex items-center justify-between">
         <CardTitle>{title}</CardTitle>
+        <DeleteDropDown listId={id} />
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {tasks?.map((task) => (
