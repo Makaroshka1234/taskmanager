@@ -20,9 +20,30 @@ const priorityStyles: Record<string, string> = {
 };
 function TaskListItem(props: TaskListItemProps) {
   const [isComplete, setIsComplete] = useState<boolean>(false);
-  const { title, priority } = props;
+  const { title, priority, id } = props;
 
-  function deleteListItem(id: string) {}
+  async function deleteListItem(id: string) {
+    try {
+      const res = await fetch("/api/task/delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          taskId: id,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete task");
+      }
+
+      const data = await res.json();
+      console.log("Deleted:", data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <>
       <EditListItemPopUp>
@@ -45,7 +66,10 @@ function TaskListItem(props: TaskListItemProps) {
                 type="button"
                 size="icon-xs"
                 variant="destructive"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteListItem(id);
+                }}
               >
                 <TrashIcon height={10} />
               </Button>
