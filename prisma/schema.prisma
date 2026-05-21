@@ -16,7 +16,10 @@ enum Priority {
   MEDIUM
   HIGH
 }
-
+enum BoardType {
+  COLOR
+  IMAGE
+}
 model User{
   id String @id @default(uuid())
   email String @unique
@@ -36,7 +39,10 @@ creatorId String
 members BoardMember[]
 boardLists BoardList[]
 created_at DateTime @default(now())
-
+backgroundType String @default("COLOR")
+uploadedImages     String[]  @default([])
+backgroundImageUrl String?
+boardColor String?
   
 } 
 
