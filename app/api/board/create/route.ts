@@ -18,6 +18,7 @@ export async function POST(req: Request) {
     data: {
       title: title,
       creatorId: user.userId,
+      boardColor: "red",
       boardLists: {
         create: [
           {
@@ -32,6 +33,7 @@ export async function POST(req: Request) {
         ],
       },
     },
+
     include: {
       boardLists: true,
     },

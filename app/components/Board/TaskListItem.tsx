@@ -21,6 +21,7 @@ const priorityStyles: Record<string, string> = {
 function TaskListItem(props: TaskListItemProps) {
   const [isComplete, setIsComplete] = useState<boolean>(false);
   const { title, priority, id } = props;
+  
 
   async function deleteListItem(id: string) {
     try {

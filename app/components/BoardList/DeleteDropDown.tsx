@@ -1,3 +1,4 @@
+import { useBoardStore } from "@/app/store/useBoardStore";
 import { Button } from "@/schadComponents/ui/button";
 import {
   DropdownMenu,
@@ -14,17 +15,7 @@ interface IDeleteDropDownProps {
 
 function DeleteDropDown(props: IDeleteDropDownProps) {
   const { listId } = props;
-  async function handleDeleteList(id: string) {
-    await fetch("/api/list/del", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        listId: id,
-      }),
-    });
-  }
+  const { deleteTaskList } = useBoardStore();
 
   return (
     <>
@@ -41,7 +32,7 @@ function DeleteDropDown(props: IDeleteDropDownProps) {
                 type="button"
                 variant="destructive"
                 className=""
-                onClick={() => handleDeleteList(listId)}
+                onClick={() => deleteTaskList(listId)}
               >
                 <p>Delete list</p>
                 <DeleteIcon />
