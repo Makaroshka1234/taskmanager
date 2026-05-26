@@ -3,38 +3,51 @@
 import { Ellipsis, UserRoundPlus } from "lucide-react";
 import CreateTaskList from "./CreateTaskList/CreateTaskList";
 import TaskList from "./TaskList";
-import { useBoard } from "@/app/hooks/useBoard";
 import { Button } from "@/schadComponents/ui/button";
 import BoardPopOver from "./BoardPopOver";
-import { useState } from "react";
+import { useEffect } from "react";
+import { useBoardStore } from "@/app/store/useBoardStore";
 
 interface IBoardprops {
   id: string;
 }
 function Board(props: IBoardprops) {
-  const [bgType, setBgType] = useState<"color" | "image">("color");
-  const [currentBg, setCurrentBg] = useState<string>("red");
   const { id } = props;
-  const { board, loading, error } = useBoard(id);
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error</div>;
-  if (!board) return null;
+  const { fetchBoard, loadingBoards, currentBoard } = useBoardStore();
+
+  const backgroundImageUrl = useBoardStore(
+    (state) => state.currentBoard?.backgroundImageUrl,
+  );
+  const currentLists = currentBoard?.boardLists ?? [];
+  const backgroundType = useBoardStore(
+    (state) => state.currentBoard?.backgroundType,
+  );
+  useEffect(() => {
+    if (!id) return;
+
+    fetchBoard(id);
+  }, [id, fetchBoard]);
+  if (loadingBoards) return <div>Loading...</div>;
+  if (!currentBoard) return <div>Loadingаааа...</div>;
   return (
     <section
       className="board h-screen bg-cover bg-center bg-no-repeat"
       style={{
-        backgroundColor: bgType === "color" ? currentBg : undefined,
-        backgroundImage: bgType === "image" ? `url('${currentBg}')` : undefined,
+        backgroundColor: backgroundType === "COLOR" ? "red" : "gray",
+        backgroundImage:
+          backgroundType === "IMAGE"
+            ? `url('${backgroundImageUrl}')`
+            : undefined,
       }}
     >
-      <div className="py-3 px-5 flex items-center justify-between">
-        <p className="board-title">Board-title</p>
+      <div className="py-3 px-5 flex items-center bg-gray-100 justify-between">
+        <p className="board-title">{currentBoard.title}</p>
         <div className="gap-5 flex">
           <Button className="invite-btn" type="button">
             <UserRoundPlus />
             Запросити
           </Button>
-          <BoardPopOver setCurrentBg={setCurrentBg} setBgType={setBgType}>
+          <BoardPopOver boardId={id}>
             <Button type="button">
               <Ellipsis />{" "}
             </Button>
@@ -42,7 +55,7 @@ function Board(props: IBoardprops) {
         </div>
       </div>
       <ul className="flex gap-3 ">
-        {board.boardLists.map((list) => (
+        {currentLists.map((list) => (
           <TaskList key={list.id} {...list} />
         ))}
         <CreateTaskList boardId={id} />

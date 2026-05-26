@@ -1,4 +1,5 @@
 import { createTaskListSchema } from "@/app/schemas/createtasklist.schema";
+import { useBoardStore } from "@/app/store/useBoardStore";
 import { apiFetch } from "@/app/utils/apiFetch";
 
 import { Button } from "@/schadComponents/ui/button";
@@ -24,22 +25,13 @@ function CreateTaskListForm({ boardId }: { boardId: string }) {
     mode: "onChange",
   });
 
-  async function CreateTaskListFormSubmit(data: createTaskListSchema) {
-    await apiFetch("/api/list/create", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ...data, boardId }),
-    });
-
-    console.log("AFTER REFRESH");
-  }
+  const { createTaskList } = useBoardStore();
   return (
     <form
       className="flex flex-col gap-5"
-      onSubmit={form.handleSubmit(CreateTaskListFormSubmit)}
+      onSubmit={form.handleSubmit((data) =>
+        createTaskList({ ...data, boardId }),
+      )}
       id="createTaskList-form"
     >
       <DialogHeader>

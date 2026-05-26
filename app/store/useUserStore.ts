@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
-import { Board } from "@/generated/prisma/client"; // Переконайся, що шлях правильний
 import { apiFetch } from "../utils/apiFetch";
+import { Board } from "./useBoardStore";
 
 export interface IUser {
   email: string;

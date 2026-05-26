@@ -8,6 +8,8 @@ import BoardListMemberList from "./BoardListMemberList";
 import { CircleArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import DeleteDropDown from "./DeleteDropDown";
+import { useBoard } from "@/app/hooks/useBoard";
+import { useBoardStore } from "@/app/store/useBoardStore";
 
 export interface IBoardListItem {
   id: string;
@@ -15,11 +17,10 @@ export interface IBoardListItem {
 }
 
 function BoardListItem(props: IBoardListItem) {
-  const { boardTitle, id } = props;
+  const { id, boardTitle } = props;
+
   const router = useRouter();
-  console.log(id);
   const goToBoard = (id: string) => {
-    console.log(id);
     router.push(`/profile/board/${id}`);
   };
   return (
@@ -27,7 +28,6 @@ function BoardListItem(props: IBoardListItem) {
       <Card>
         <CardHeader>
           <CardTitle>{boardTitle}</CardTitle>
-          
         </CardHeader>
         <CardContent className="flex items-center justify-between">
           <BoardListMemberList />

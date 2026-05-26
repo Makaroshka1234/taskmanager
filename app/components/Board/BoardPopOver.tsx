@@ -1,3 +1,5 @@
+import { useBoard } from "@/app/hooks/useBoard";
+import { useBoardStore } from "@/app/store/useBoardStore";
 import { Button } from "@/schadComponents/ui/button";
 import { Card, CardContent } from "@/schadComponents/ui/card";
 import {
@@ -8,46 +10,84 @@ import {
   PopoverTrigger,
 } from "@/schadComponents/ui/popover";
 import { Separator } from "@/schadComponents/ui/separator";
-import {
-  ChevronLeft,
-  LucideFlagTriangleLeft,
-  Plus,
-  Underline,
-} from "lucide-react";
+import { ChevronLeft, Plus } from "lucide-react";
 import { useState } from "react";
 
 type Props = {
   children: React.ReactNode;
 
-  setCurrentBg: React.Dispatch<React.SetStateAction<string>>;
-  setBgType: React.Dispatch<React.SetStateAction<"color" | "image">>;
+  boardId: string;
 };
+
 type ViewType = "MENU" | "CHANGEBG" | "PHOTOS" | "COLORS";
-function BoardPopOver({ children, setBgType, setCurrentBg }: Props) {
+
+function BoardPopOver({ children, boardId }: Props) {
+  const backgroundImageUrl = useBoardStore(
+    (state) => state.currentBoard?.backgroundImageUrl,
+  );
+  const boardBgImages = useBoardStore(
+    (state) => state.currentBoard?.uploadedImages,
+  );
+  const setImageUrl = useBoardStore((state) => state.setImageUrl);
+  const setBgType = useBoardStore((state) => state.setBackgroundType);
   const [currentView, setCurrentView] = useState<ViewType>("MENU");
-  const [uploadedImages, setUploadedImages] = useState<string[]>([
-    "https://trello.com/assets/8f9c1323c9c16601a9a4.jpg",
-    "https://trello.com/assets/8f9c1323c9c16601a9a4.jpg",
-    "https://trello.com/assets/8f9c1323c9c16601a9a4.jpg",
-  ]);
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // 1. Дістаємо файл, який вибрав користувач
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // 2. Генерація тимчасового URL для відображення в браузері
-    const localImageUrl = URL.createObjectURL(file);
+    const formData = new FormData();
+    formData.append("image", file);
 
-    // 3. Додаємо цей URL в масив картинок
-    setUploadedImages((prev) => [...prev, localImageUrl]);
+    try {
+      const res = await fetch("/api/board/bgUpload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Failed to upload image to storage");
 
-    // Звільняємо пам'ять (good practice, щоб браузер не тупив при купі картинок)
-    // Можна зробити трохи згодом, або коли компонент розмонтується
+      const data = await res.json();
+      const url = data.url;
+
+      setImageUrl(url);
+
+      await fetch("/api/board/add-image", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          boardId,
+          url,
+        }),
+      });
+    } catch (error) {
+      console.error("Error updating board background:", error);
+    }
   };
-  const handleChangeBgPhoto = (url: string) => {
-    setBgType("image");
-    setCurrentBg(url);
+
+  const handleChangeBgPhoto = async (url: string) => {
+    try {
+      setBgType("IMAGE");
+      setImageUrl(url);
+      const res = await fetch("/api/board/updBg", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          boardId,
+          backgroundImageUrl: url,
+          backgroundType: "IMAGE",
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update background on server");
+    } catch (error) {
+      console.error("Помилка оновлення фону:", error);
+    }
   };
+
   return (
     <Popover>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
@@ -87,7 +127,6 @@ function BoardPopOver({ children, setBgType, setCurrentBg }: Props) {
                       }}
                     />
                   </Button>
-
                   <p className="bg-variant-title">Фотографії</p>
                 </li>
                 <li className="bg-variant text-center">
@@ -103,18 +142,16 @@ function BoardPopOver({ children, setBgType, setCurrentBg }: Props) {
                       }}
                     />
                   </Button>
-
                   <p className="bg-variant-title">Кольори</p>
                 </li>
               </ul>
               <Separator />
               <ul className="grid grid-cols-2 gap-2 w-full">
-                {/* КАРТКА №1: Кнопка "Додати свій" (Завжди перша або остання, як тобі зручніше) */}
+                {/* КАРТКА №1: Кнопка "Додати свій" */}
                 <li className="h-30 w-full">
                   <Card className="relative h-full w-full p-0 overflow-hidden border-2 border-dashed bg-gray-50 hover:bg-gray-100 transition cursor-pointer rounded-md">
                     <CardContent className="h-full w-full flex items-center justify-center p-0">
                       <Plus className="h-6 w-6 text-gray-400" />
-
                       <form className="absolute inset-0 w-full h-full z-10">
                         <input
                           type="file"
@@ -127,8 +164,8 @@ function BoardPopOver({ children, setBgType, setCurrentBg }: Props) {
                     </CardContent>
                   </Card>
                 </li>
-
-                {uploadedImages.map((url, index) => (
+                \
+                {boardBgImages?.map((url: string, index) => (
                   <li
                     key={index}
                     className="h-30 w-full rounded-md overflow-hidden border bg-gray-100 hover:opacity-90 transition cursor-pointer"

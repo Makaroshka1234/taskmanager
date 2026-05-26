@@ -1,12 +1,12 @@
+"use client";
+
 import { createBoardSchema } from "@/app/schemas/createboard.schema";
-import { apiFetch } from "@/app/utils/apiFetch";
+import { useBoardStore } from "@/app/store/useBoardStore";
 
 import { Button } from "@/schadComponents/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
   DialogHeader,
+  DialogDescription,
   DialogTitle,
 } from "@/schadComponents/ui/dialog";
 import { Field, FieldError, FieldGroup } from "@/schadComponents/ui/field";
@@ -15,7 +15,13 @@ import { Label } from "@/schadComponents/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 
-function CreateBoardForm() {
+interface CreateBoardFormProps {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function CreateBoardForm(props: CreateBoardFormProps) {
+  const { open, setOpen } = props;
   const form = useForm<createBoardSchema>({
     resolver: zodResolver(createBoardSchema),
     defaultValues: {
@@ -24,22 +30,18 @@ function CreateBoardForm() {
     mode: "onChange",
   });
 
-  async function CreateBoardFormSubmit(data: createBoardSchema) {
-    await apiFetch("/api/board/create", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+  const { createBoard } = useBoardStore();
 
-    console.log("AFTER REFRESH");
-  }
+  const onSubmit = (data: createBoardSchema) => {
+    createBoard(data);
+    form.reset();
+    setOpen(false);
+  };
+
   return (
     <form
       className="flex flex-col gap-5"
-      onSubmit={form.handleSubmit(CreateBoardFormSubmit)}
+      onSubmit={form.handleSubmit(onSubmit)}
       id="createBoard-form"
     >
       <DialogHeader>
@@ -59,18 +61,9 @@ function CreateBoardForm() {
             </Field>
           )}
         />
-        {/* <Field>
-          <Label htmlFor="board-title">Board title</Label>
-          <Input
-            id="board-title"
-            name="board-title"
-            placeholder="Board-title"
-          />
-        </Field> */}
       </FieldGroup>
-      <Button variant="default" size="default" type="submit">
-        Create Board
-      </Button>
+
+      <Button type="submit">Create Board</Button>
     </form>
   );
 }
