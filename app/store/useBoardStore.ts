@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+import { API_ROUTES } from "../utils/constans/apiRoutes";
 
 type Priority = "LOW" | "HIGH" | "MEDIUM";
 
@@ -43,6 +44,10 @@ interface addTaskPayload {
   title: string;
   priority: Priority;
 }
+interface deleteTaskData {
+  taskId: string;
+  taskListId: string;
+}
 
 interface BoardState {
   boards: Board[];
@@ -64,6 +69,7 @@ interface BoardState {
   deleteTaskList: (taskListId: string) => Promise<void>;
   setTasks: (tasks: Task[]) => void;
   addTask: (payload: addTaskPayload) => Promise<void>;
+  deleteTask: (data: deleteTaskData) => void;
 }
 
 export const useBoardStore = create<BoardState>()(
@@ -302,6 +308,38 @@ export const useBoardStore = create<BoardState>()(
         "task/add_succ",
       );
     },
+    deleteTask: async ({ taskId, taskListId }) => {
+      try {
+        const res = await fetch("/api/task/delete", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ taskId }),
+        });
+        if (!res.ok) throw new Error("delete task failed");
+
+        set(
+          (state) => ({
+            currentBoard: {
+              ...state.currentBoard,
+              boardLists: (state.currentBoard.boardLists ?? []).map((list) =>
+                list.id !== taskListId
+                  ? list
+                  : {
+                      ...list,
+                      tasks: list.tasks.filter((t) => t.id !== taskId),
+                    },
+              ),
+            },
+          }),
+          false,
+          "task/delete_success",
+        );
+      } catch (err) {
+        throw new Error("delete task failed");
+      }
+    },
   })),
 );
 
@@ -311,3 +349,5 @@ export const useBoardGetTaskLists = () =>
   useBoardStore((state) => state.currentBoard.boardLists);
 // export const useBoardSetTasks = () => useBoardStore((state) => state.setTasks);
 export const useBoardAddTask = () => useBoardStore((state) => state.addTask);
+export const useBoardDeleteTask = () =>
+  useBoardStore((state) => state.deleteTask);

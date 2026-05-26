@@ -6,11 +6,13 @@ import { Input } from "@/schadComponents/ui/input";
 import { Checkbox } from "@/schadComponents/ui/checkbox";
 import { Badge } from "@/schadComponents/ui/badge";
 import { useState } from "react";
+import { useBoardDeleteTask } from "@/app/store/useBoardStore";
 
 interface TaskListItemProps {
-  id: string;
+  taskId: string;
   title: string;
   priority: string;
+  taskListId: string;
 }
 const priorityStyles: Record<string, string> = {
   HIGH: "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300",
@@ -20,31 +22,9 @@ const priorityStyles: Record<string, string> = {
 };
 function TaskListItem(props: TaskListItemProps) {
   const [isComplete, setIsComplete] = useState<boolean>(false);
-  const { title, priority, id } = props;
-  
+  const { title, priority, taskId, taskListId } = props;
+  const deleteTask = useBoardDeleteTask();
 
-  async function deleteListItem(id: string) {
-    try {
-      const res = await fetch("/api/task/delete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          taskId: id,
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to delete task");
-      }
-
-      const data = await res.json();
-      console.log("Deleted:", data);
-    } catch (error) {
-      console.log(error);
-    }
-  }
   return (
     <>
       <EditListItemPopUp>
@@ -69,7 +49,7 @@ function TaskListItem(props: TaskListItemProps) {
                 variant="destructive"
                 onClick={(e) => {
                   e.stopPropagation();
-                  deleteListItem(id);
+                  deleteTask({ taskId, taskListId });
                 }}
               >
                 <TrashIcon height={10} />
