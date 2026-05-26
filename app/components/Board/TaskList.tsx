@@ -29,7 +29,13 @@ function TaskList(props: BoardList) {
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {tasks?.map((task) => (
-          <TaskListItem key={task.id} {...task} />
+          <TaskListItem
+            key={task.id}
+            taskId={task.id}
+            title={task.title}
+            priority={task.priority}
+            taskListId={id}
+          />
         ))}
         <AddTaskListItem boardListId={id} />
       </CardContent>
