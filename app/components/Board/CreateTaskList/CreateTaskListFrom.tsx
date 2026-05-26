@@ -31,6 +31,7 @@ function CreateTaskListForm({ boardId }: { boardId: string }) {
       className="flex flex-col gap-5"
       onSubmit={form.handleSubmit((data) =>
         createTaskList({ ...data, boardId }),
+    
       )}
       id="createTaskList-form"
     >

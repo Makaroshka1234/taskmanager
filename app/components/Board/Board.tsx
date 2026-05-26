@@ -6,7 +6,7 @@ import TaskList from "./TaskList";
 import { Button } from "@/schadComponents/ui/button";
 import BoardPopOver from "./BoardPopOver";
 import { useEffect } from "react";
-import { useBoardStore } from "@/app/store/useBoardStore";
+import { useBoardGetTaskLists, useBoardStore } from "@/app/store/useBoardStore";
 
 interface IBoardprops {
   id: string;
@@ -14,11 +14,12 @@ interface IBoardprops {
 function Board(props: IBoardprops) {
   const { id } = props;
   const { fetchBoard, loadingBoards, currentBoard } = useBoardStore();
+  const boardLists = useBoardGetTaskLists();
 
   const backgroundImageUrl = useBoardStore(
     (state) => state.currentBoard?.backgroundImageUrl,
   );
-  const currentLists = currentBoard?.boardLists ?? [];
+
   const backgroundType = useBoardStore(
     (state) => state.currentBoard?.backgroundType,
   );
@@ -55,7 +56,7 @@ function Board(props: IBoardprops) {
         </div>
       </div>
       <ul className="flex gap-3 ">
-        {currentLists.map((list) => (
+        {boardLists?.map((list) => (
           <TaskList key={list.id} {...list} />
         ))}
         <CreateTaskList boardId={id} />

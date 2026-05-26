@@ -30,6 +30,7 @@ import PriorityList from "../PriorityList/PriorityList";
 
 import { createTaskSchema } from "@/app/schemas/createtask.schema";
 import { z } from "zod";
+import { useBoardAddTask } from "@/app/store/useBoardStore";
 
 // 👇 витягуємо тип правильно (ВАЖЛИВО)
 type CreateTaskSchema = z.infer<typeof createTaskSchema>;
@@ -57,21 +58,13 @@ function AddTaskListItemForm({ boardListId }: { boardListId: string }) {
   });
 
   const priority = watch("priority");
-
+  const addTask = useBoardAddTask();
   async function onSubmit(data: CreateTaskSchema) {
-    await fetch("/api/task/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...data,
-        boardListId,
-      }),
+    await addTask({
+      ...data,
+      boardListId: boardListId,
     });
-
-    reset(); // 🔥 очистка форми після submit
-  
+    reset();
   }
 
   return (

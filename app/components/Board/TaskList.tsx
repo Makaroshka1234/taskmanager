@@ -20,7 +20,7 @@ type Task = {
 };
 
 function TaskList(props: BoardList) {
-  const { tasks, title, id } = props;
+  const { title, id, tasks } = props;
   return (
     <Card size="default" className="min-w-sm max-w-md">
       <CardHeader className="flex items-center justify-between">

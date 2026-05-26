@@ -38,9 +38,15 @@ interface CreateTaskListPayload {
   boardId: string;
 }
 
+interface addTaskPayload {
+  boardListId: string;
+  title: string;
+  priority: Priority;
+}
+
 interface BoardState {
   boards: Board[];
-  currentBoard: Board | null;
+  currentBoard: Board;
   loadingBoards: boolean;
   creatingBoard: boolean;
   deletingBoard: boolean;
@@ -54,23 +60,25 @@ interface BoardState {
   setImageUrl: (url: string) => Promise<void>;
   setBackgroundType: (type: "COLOR" | "IMAGE") => Promise<void>;
   uploadedImages: string[];
-  tasks: Task[];
   createTaskList: (data: CreateTaskListPayload) => Promise<void>;
   deleteTaskList: (taskListId: string) => Promise<void>;
+  setTasks: (tasks: Task[]) => void;
+  addTask: (payload: addTaskPayload) => Promise<void>;
 }
 
 export const useBoardStore = create<BoardState>()(
   devtools((set) => ({
     boards: [],
-    tasks: [],
-    currentBoard: null,
-    loadingBoards: false,
-    creatingBoard: false,
-    deletingBoard: false,
-    backgroundType: "COLOR",
-    bgImageUrl: "",
-    currentBg: "red",
-    uploadedImages: [],
+    currentBoard: {
+      id: "",
+      title: "",
+      tasks: [],
+      boardLists: [],
+      uploadedImages: [],
+      backgroundImageUrl: "",
+      backgroundType: "COLOR",
+      boardColor: "red",
+    },
 
     fetchBoard: async (boardId) => {
       try {
@@ -171,7 +179,6 @@ export const useBoardStore = create<BoardState>()(
               uploadedImages: alreadyHas
                 ? currentImages
                 : [...currentImages, url],
-              tasks: [...(state.tasks ?? [])],
             },
           };
         },
@@ -215,7 +222,10 @@ export const useBoardStore = create<BoardState>()(
           return {
             currentBoard: {
               ...state.currentBoard,
-              boardLists: [...(state.currentBoard.boardLists ?? []), newList],
+              boardLists: [
+                ...((state.currentBoard.boardLists ?? []) as BoardList[]),
+                newList,
+              ],
             },
           };
         },
@@ -253,5 +263,51 @@ export const useBoardStore = create<BoardState>()(
         "taskList/delete_success",
       );
     },
+
+    addTask: async (payload) => {
+      const res = await fetch("/api/task/create/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        throw new Error(`Cant create task`);
+      }
+      const newTask = await res.json();
+      set(
+        (state) => {
+          if (!state.currentBoard || !state.currentBoard.boardLists)
+            return state;
+
+          return {
+            currentBoard: {
+              ...state.currentBoard,
+
+              boardLists: state.currentBoard.boardLists.map((list) => {
+                if (list.id !== payload.boardListId) {
+                  return list;
+                }
+
+                return {
+                  ...list,
+                  tasks: [...(list.tasks ?? []), newTask],
+                };
+              }),
+            },
+          };
+        },
+        false,
+        "task/add_succ",
+      );
+    },
   })),
 );
+
+export const useBoardGetTasks = () =>
+  useBoardStore((state) => state.currentBoard.tasks);
+export const useBoardGetTaskLists = () =>
+  useBoardStore((state) => state.currentBoard.boardLists);
+// export const useBoardSetTasks = () => useBoardStore((state) => state.setTasks);
+export const useBoardAddTask = () => useBoardStore((state) => state.addTask);
