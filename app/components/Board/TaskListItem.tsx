@@ -6,7 +6,10 @@ import { Input } from "@/schadComponents/ui/input";
 import { Checkbox } from "@/schadComponents/ui/checkbox";
 import { Badge } from "@/schadComponents/ui/badge";
 import { useState } from "react";
-import { useBoardDeleteTask } from "@/app/store/useBoardStore";
+import {
+  useBoardDeleteTask,
+  useBoardSetCurrentTask,
+} from "@/app/store/useBoardStore";
 
 interface TaskListItemProps {
   taskId: string;
@@ -24,11 +27,14 @@ function TaskListItem(props: TaskListItemProps) {
   const [isComplete, setIsComplete] = useState<boolean>(false);
   const { title, priority, taskId, taskListId } = props;
   const deleteTask = useBoardDeleteTask();
-
+  const setCurrentTask = useBoardSetCurrentTask();
   return (
     <>
       <EditListItemPopUp>
-        <li className="flex items-center justify-between border py-3 px-3 cursor-pointer hover:bg-muted/50 transition rounded-xl">
+        <li
+          onClick={() => setCurrentTask({ taskId, taskListId })}
+          className="flex items-center justify-between border py-3 px-3 cursor-pointer hover:bg-muted/50 transition rounded-xl"
+        >
           <div className="flex gap-3">
             <Checkbox
               onClick={(e) => e.stopPropagation()}

@@ -1,12 +1,13 @@
 "use client";
 
 import BoardListItem from "./BoardListItem";
-import CreateBoard from "./CreateBoard";
+
 import { useUserStore } from "@/app/store/useUserStore";
 import DeleteDropDown from "./DeleteDropDown";
 import { Board, useBoardStore } from "@/app/store/useBoardStore";
 import { set } from "zod";
 import { useEffect } from "react";
+import CreateBoard from "./CreateBoard/CreateBoard";
 
 export interface IBoardList {
   title: string;

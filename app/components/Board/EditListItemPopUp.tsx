@@ -14,15 +14,17 @@ import {
 } from "@/schadComponents/ui/resizable";
 import { Props } from "next/script";
 import Res from "./Res";
+import { useBoardGetCurrentTask } from "@/app/store/useBoardStore";
 
 function EditListItemPopUp({ children }: Props) {
+  const curentTask = useBoardGetCurrentTask();
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
-      <DialogContent className=" sm:max-w-4xl">
+      <DialogContent className=" sm:max-w-4xl sm:h-20xl ">
         <DialogHeader>
-          <DialogTitle>fdfdfdfdfd</DialogTitle>
+          <DialogTitle></DialogTitle>
           <DialogClose />
         </DialogHeader>
         <Res />

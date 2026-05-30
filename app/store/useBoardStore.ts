@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { API_ROUTES } from "../utils/constans/apiRoutes";
+import { id } from "zod/v4/locales";
 
 type Priority = "LOW" | "HIGH" | "MEDIUM";
 
@@ -48,10 +49,19 @@ interface deleteTaskData {
   taskId: string;
   taskListId: string;
 }
+interface setCurrentTaskData {
+  taskId: string;
+  taskListId: string;
+}
+interface updateTaskData {
+  taskListId: string;
+  uptadedTask: Partial<Task>;
+}
 
 interface BoardState {
   boards: Board[];
   currentBoard: Board;
+  currentTask: Task;
   loadingBoards: boolean;
   creatingBoard: boolean;
   deletingBoard: boolean;
@@ -70,11 +80,20 @@ interface BoardState {
   setTasks: (tasks: Task[]) => void;
   addTask: (payload: addTaskPayload) => Promise<void>;
   deleteTask: (data: deleteTaskData) => void;
+  setCurrentTask: (data: setCurrentTaskData) => void;
+  uptadeTask: (taskListId: string, uptadedTask: Partial<Task>) => void;
 }
 
 export const useBoardStore = create<BoardState>()(
   devtools((set) => ({
     boards: [],
+    currentTask: {
+      id: "",
+      title: "",
+      priority: "LOW",
+      completed: false,
+      boardListId: "",
+    },
     currentBoard: {
       id: "",
       title: "",
@@ -340,6 +359,57 @@ export const useBoardStore = create<BoardState>()(
         throw new Error("delete task failed");
       }
     },
+    setCurrentTask: (data: setCurrentTaskData) => {
+      const { taskId, taskListId } = data;
+
+      set(
+        (state) => {
+          const taskList = state.currentBoard?.boardLists?.find(
+            (list) => list.id === taskListId,
+          );
+
+          const task = taskList?.tasks?.find((t) => t.id === taskId);
+
+          return {
+            currentTask: task || state.currentTask,
+          };
+        },
+        false,
+        "currentTask/set",
+      );
+    },
+    uptadeTask: (taskListId: string, uptadedTask: Partial<Task>) => {
+      set(
+        (state) => {
+          return {
+            currentBoard: {
+              ...state.currentBoard,
+              boardLists: state.currentBoard.boardLists?.map((list) =>
+                list.id === taskListId
+                  ? {
+                      ...list,
+                      tasks: list.tasks.map((t) =>
+                        t.id === uptadedTask.id
+                          ? {
+                              ...t,
+                              ...uptadedTask,
+                            }
+                          : t,
+                      ),
+                    }
+                  : list,
+              ),
+            },
+            currentTask:
+              state.currentTask?.id === uptadedTask.id
+                ? { ...state.currentTask, ...uptadedTask }
+                : state.currentTask,
+          };
+        },
+        false,
+        "task/uptade",
+      );
+    },
   })),
 );
 
@@ -351,3 +421,9 @@ export const useBoardGetTaskLists = () =>
 export const useBoardAddTask = () => useBoardStore((state) => state.addTask);
 export const useBoardDeleteTask = () =>
   useBoardStore((state) => state.deleteTask);
+export const useBoardSetCurrentTask = () =>
+  useBoardStore((state) => state.setCurrentTask);
+export const useBoardGetCurrentTask = () =>
+  useBoardStore((state) => state.currentTask);
+export const useBoardUpdateTask = () =>
+  useBoardStore((state) => state.uptadeTask);

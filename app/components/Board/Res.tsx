@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  useBoardGetCurrentTask,
+  useBoardUpdateTask,
+} from "@/app/store/useBoardStore";
 import { Input } from "@/schadComponents/ui/input";
 import {
   ResizableHandle,
@@ -9,7 +13,18 @@ import {
 import { useState } from "react";
 
 function Res() {
-  const [taskTitle, setTaskTitle] = useState("sfsdsdsdd");
+  const curentTask = useBoardGetCurrentTask();
+  const uptadeTask = useBoardUpdateTask();
+
+  function hadleChangeTitle(title: string) {
+    uptadeTask(curentTask.boardListId, { ...curentTask, title: title });
+  }
+  function handleChangeCompleted() {
+    uptadeTask(curentTask.boardListId, {
+      ...curentTask,
+      completed: !curentTask.completed,
+    });
+  }
   return (
     <ResizablePanelGroup
       orientation="horizontal"
@@ -24,8 +39,18 @@ function Res() {
         >
           <div className="inner flex flex-col">
             <div className="task-inputs flex gap-2">
-              <input type="checkbox" name="todo-checkbox" id="todo-checkbox" />
-              <Input className="border-none" defaultValue={taskTitle} />
+              <input
+                type="checkbox"
+                name="todo-checkbox"
+                id="todo-checkbox"
+                checked={curentTask.completed}
+                onChange={() => handleChangeCompleted()}
+              />
+              <Input
+                className="border-none"
+                defaultValue={curentTask.title}
+                onChange={(e) => hadleChangeTitle(e.target.value)}
+              />
             </div>
           </div>
         </div>

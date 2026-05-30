@@ -5,8 +5,9 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/schadComponents/ui/dialog";
-import CreateBoardForm from "./CreateBoardForm";
+
 import { useState } from "react";
+import CreateBoardForm from "./CreateBoardForm";
 
 function CreateBoard() {
   const [open, setOpen] = useState(false);
