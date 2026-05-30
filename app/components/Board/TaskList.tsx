@@ -4,20 +4,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/schadComponents/ui/card";
-import TaskListItem from "./TaskListItem";
+
 import AddTaskListItem from "./AddTaskListItem";
 import DeleteDropDown from "../BoardList/DeleteDropDown";
+import Task from "@/app/store/useBoardStore";
+import TaskListItem from "./TaskListItem";
+
 
 type BoardList = {
   id: string;
   title: string;
   tasks: Task[];
 };
-type Task = {
-  id: string;
-  title: string;
-  priority: string;
-};
+
 
 function TaskList(props: BoardList) {
   const { title, id, tasks } = props;
@@ -35,6 +34,7 @@ function TaskList(props: BoardList) {
             title={task.title}
             priority={task.priority}
             taskListId={id}
+            completed={task.completed}
           />
         ))}
         <AddTaskListItem boardListId={id} />

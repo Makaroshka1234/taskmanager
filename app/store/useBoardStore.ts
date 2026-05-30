@@ -12,7 +12,7 @@ interface BoardList {
   boardId: string;
 }
 
-interface Task {
+export default interface Task {
   id: string;
   title: string;
   priority: Priority;

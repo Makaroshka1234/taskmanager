@@ -8,14 +8,18 @@ import { Badge } from "@/schadComponents/ui/badge";
 import { useState } from "react";
 import {
   useBoardDeleteTask,
+  useBoardGetCurrentTask,
   useBoardSetCurrentTask,
+  useBoardUpdateTask,
 } from "@/app/store/useBoardStore";
+import { Priority } from "@/generated/prisma/enums";
 
 interface TaskListItemProps {
   taskId: string;
   title: string;
-  priority: string;
+  priority: Priority;
   taskListId: string;
+  completed: boolean;
 }
 const priorityStyles: Record<string, string> = {
   HIGH: "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300",
@@ -24,10 +28,21 @@ const priorityStyles: Record<string, string> = {
   LOW: "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300",
 };
 function TaskListItem(props: TaskListItemProps) {
-  const [isComplete, setIsComplete] = useState<boolean>(false);
-  const { title, priority, taskId, taskListId } = props;
+  const { title, priority, taskId, taskListId, completed } = props;
   const deleteTask = useBoardDeleteTask();
   const setCurrentTask = useBoardSetCurrentTask();
+  const curentTask = useBoardGetCurrentTask();
+  const uptadeTask = useBoardUpdateTask();
+
+  function handleChangeCompleted() {
+    uptadeTask(taskListId, {
+      title: title,
+      priority: priority,
+      id: taskId,
+      boardListId: taskListId,
+      completed: !completed,
+    });
+  }
   return (
     <>
       <EditListItemPopUp>
@@ -38,9 +53,9 @@ function TaskListItem(props: TaskListItemProps) {
           <div className="flex gap-3">
             <Checkbox
               onClick={(e) => e.stopPropagation()}
-              checked={isComplete}
-              onCheckedChange={(checked) => {
-                setIsComplete(checked === true);
+              checked={completed}
+              onCheckedChange={() => {
+                handleChangeCompleted();
               }}
             />
 
@@ -48,7 +63,7 @@ function TaskListItem(props: TaskListItemProps) {
           </div>
           <div className="flex gap-2 items-center">
             <Badge className={priorityStyles[priority]}>{priority}</Badge>
-            {isComplete && (
+            {completed && (
               <Button
                 type="button"
                 size="icon-xs"
@@ -67,5 +82,4 @@ function TaskListItem(props: TaskListItemProps) {
     </>
   );
 }
-
 export default TaskListItem;

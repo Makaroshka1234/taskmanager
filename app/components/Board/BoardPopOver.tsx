@@ -164,7 +164,7 @@ function BoardPopOver({ children, boardId }: Props) {
                     </CardContent>
                   </Card>
                 </li>
-                \
+
                 {boardBgImages?.map((url: string, index) => (
                   <li
                     key={index}
