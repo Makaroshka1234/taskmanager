@@ -10,6 +10,7 @@ import {
   useBoardDeleteTask,
   useBoardGetCurrentTask,
   useBoardSetCurrentTask,
+  useBoardStore,
   useBoardUpdateTask,
 } from "@/app/store/useBoardStore";
 import { Priority } from "@/generated/prisma/enums";
@@ -31,8 +32,9 @@ function TaskListItem(props: TaskListItemProps) {
   const { title, priority, taskId, taskListId, completed } = props;
   const deleteTask = useBoardDeleteTask();
   const setCurrentTask = useBoardSetCurrentTask();
-  const curentTask = useBoardGetCurrentTask();
+
   const uptadeTask = useBoardUpdateTask();
+  const fetchComments = useBoardStore((state) => state.fetchComments);
 
   function handleChangeCompleted() {
     uptadeTask(taskListId, {
@@ -43,11 +45,16 @@ function TaskListItem(props: TaskListItemProps) {
       completed: !completed,
     });
   }
+  function handleTaskClick() {
+    setCurrentTask({ taskId, taskListId });
+
+    fetchComments(taskId);
+  }
   return (
     <>
       <EditListItemPopUp>
         <li
-          onClick={() => setCurrentTask({ taskId, taskListId })}
+          onClick={handleTaskClick}
           className="flex items-center justify-between border py-3 px-3 cursor-pointer hover:bg-muted/50 transition rounded-xl"
         >
           <div className="flex gap-3">

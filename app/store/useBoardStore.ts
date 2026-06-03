@@ -2,34 +2,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { API_ROUTES } from "../utils/constans/apiRoutes";
 import { id } from "zod/v4/locales";
-
-type Priority = "LOW" | "HIGH" | "MEDIUM";
-
-interface BoardList {
-  id: string;
-  title: string;
-  tasks: Task[];
-  boardId: string;
-}
-
-export default interface Task {
-  id: string;
-  title: string;
-  priority: Priority;
-  completed: boolean;
-  boardListId: string;
-}
-
-export interface Board {
-  id: string;
-  title: string;
-  boardLists?: BoardList[];
-  backgroundType?: string;
-  uploadedImages?: string[] | null;
-  backgroundImageUrl?: string | null;
-  boardColor?: string | null;
-  tasks: Task[];
-}
+import { Task, Board, Priority, BoardList } from "../types/board";
 
 interface CreateBoardPayload {
   title: string;
@@ -65,16 +38,17 @@ interface BoardState {
   loadingBoards: boolean;
   creatingBoard: boolean;
   deletingBoard: boolean;
+  backgroundType: string;
+  currentBg: string;
+  bgImageUrl: string;
+  uploadedImages: string[];
   fetchBoard: (boardId: string) => Promise<void>;
   createBoard: (data: CreateBoardPayload) => Promise<void>;
   deleteBoard: (boardId: string) => Promise<void>;
   setBoards: (boards: Board[]) => void;
-  backgroundType: string;
-  currentBg: string;
-  bgImageUrl: string;
   setImageUrl: (url: string) => Promise<void>;
   setBackgroundType: (type: "COLOR" | "IMAGE") => Promise<void>;
-  uploadedImages: string[];
+
   createTaskList: (data: CreateTaskListPayload) => Promise<void>;
   deleteTaskList: (taskListId: string) => Promise<void>;
   setTasks: (tasks: Task[]) => void;
@@ -82,6 +56,14 @@ interface BoardState {
   deleteTask: (data: deleteTaskData) => void;
   setCurrentTask: (data: setCurrentTaskData) => void;
   uptadeTask: (taskListId: string, uptadedTask: Partial<Task>) => void;
+  createComment: (
+    text: string,
+    creatorId: string,
+    taskId: string,
+    creatorEmail: string,
+  ) => Promise<void>;
+  fetchComments: (taskId: string) => Promise<void>;
+  loadingComments: boolean;
 }
 
 export const useBoardStore = create<BoardState>()(
@@ -93,6 +75,7 @@ export const useBoardStore = create<BoardState>()(
       priority: "LOW",
       completed: false,
       boardListId: "",
+      comments: [],
     },
     currentBoard: {
       id: "",
@@ -410,6 +393,86 @@ export const useBoardStore = create<BoardState>()(
         "task/uptade",
       );
     },
+    createComment: async (text, creatorId, taskId, creatorEmail) => {
+      try {
+        const res = await fetch("/api/comments/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text, creatorId, taskId, creatorEmail }),
+        });
+
+        if (!res.ok) {
+          throw new Error(`Cant create comment`);
+        }
+
+        const newComment = await res.json();
+
+        set(
+          (state) => {
+            if (!state.currentBoard || !state.currentBoard.boardLists)
+              return state;
+
+            return {
+              currentBoard: {
+                ...state.currentBoard,
+                boardLists: state.currentBoard.boardLists.map((list) => ({
+                  ...list,
+                  tasks: list.tasks.map((task) =>
+                    task.id === taskId
+                      ? {
+                          ...task,
+                          // Додаємо новий коментар у масив (якщо його не було, створюємо масив)
+                          comments: [...(task.comments || []), newComment],
+                        }
+                      : task,
+                  ),
+                })),
+              },
+
+              currentTask:
+                state.currentTask.id === taskId
+                  ? {
+                      ...state.currentTask,
+                      comments: [
+                        ...(state.currentTask.comments || []),
+                        newComment,
+                      ],
+                    }
+                  : state.currentTask,
+            };
+          },
+          false,
+          "comment/create_success",
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    fetchComments: async (taskId: string) => {
+      set({ loadingComments: true }, false, "comments/fetch_request");
+      try {
+        const res = await fetch(`/api/comments?taskId=${taskId}`);
+
+        if (!res.ok) throw new Error("Failed to fetch comments");
+
+        const comments = await res.json();
+
+        set(
+          (state) => ({
+            currentTask: {
+              ...state.currentTask,
+              comments: comments,
+            },
+            loadingComments: false,
+          }),
+          false,
+          "comments/fetch_success",
+        );
+      } catch (err) {
+        console.error(err);
+        set({ loadingComments: false }, false, "comments/fetch_failed");
+      }
+    },
   })),
 );
 
@@ -427,3 +490,8 @@ export const useBoardGetCurrentTask = () =>
   useBoardStore((state) => state.currentTask);
 export const useBoardUpdateTask = () =>
   useBoardStore((state) => state.uptadeTask);
+
+export const useCreateComment = () =>
+  useBoardStore((state) => state.createComment);
+export const useBoardTaskGetComments = () =>
+  useBoardStore((state) => state.currentTask?.comments);

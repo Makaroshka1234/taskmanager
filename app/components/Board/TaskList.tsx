@@ -7,16 +7,15 @@ import {
 
 import AddTaskListItem from "./AddTaskListItem";
 import DeleteDropDown from "../BoardList/DeleteDropDown";
-import Task from "@/app/store/useBoardStore";
-import TaskListItem from "./TaskListItem";
 
+import TaskListItem from "./TaskListItem";
+import { Task } from "@/app/types/board";
 
 type BoardList = {
   id: string;
   title: string;
   tasks: Task[];
 };
-
 
 function TaskList(props: BoardList) {
   const { title, id, tasks } = props;

@@ -25,9 +25,10 @@ model User{
   email String @unique
   password String
   boards Board[] 
+  comments TaskComment[]
 
 memberships BoardMember[]
-
+@@unique([id, email])
 created_at DateTime @default(now())
 updated_at DateTime @updatedAt 
 }
@@ -53,6 +54,7 @@ model BoardMember{
   role MemberRole
  user User @relation(fields: [userId],references: [id])
  board Board @relation(fields: [boardId],references: [id])
+ 
 
 
 created_at DateTime @default(now())
@@ -74,9 +76,22 @@ model Task{
  priority Priority
  completed Boolean
  boardListId String
- 
+ comments TaskComment[]
  boardList BoardList @relation(fields: [boardListId],references: [id])
 
  created_at DateTime @default(now())
+
+}
+model TaskComment{
+id String @id @default(uuid())
+text String
+creatorId String
+taskId String
+creatorEmail String
+
+creator User @relation(fields: [creatorId,creatorEmail], references: [id,email])
+task Task @relation(fields: [taskId],references: [id])
+created_at DateTime @default(now())
+updated_at DateTime @updatedAt 
 
 }
