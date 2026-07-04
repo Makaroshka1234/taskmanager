@@ -22,7 +22,7 @@ export default function Header() {
     router.push("/login");
   };
   return (
-    <header className="bg-black text-amber-50 shrink-0">
+    <header className="bg-black text-amber-50 shrink-0 ">
       <div className="header__inner flex items-center px-5 py-3.5 justify-between">
         <Image src="/vercel.svg" alt="logo" width={50} height={50} />
         <div className="flex gap-5 items-center">

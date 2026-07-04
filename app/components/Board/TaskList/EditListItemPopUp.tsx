@@ -8,10 +8,10 @@ import {
   DialogTrigger,
 } from "@/schadComponents/ui/dialog";
 
-import { Props } from "next/script";
-import Res from "./Res";
+import { type ReactNode } from "react";
+import Res from "../Res";
 
-function EditListItemPopUp({ children }: Props) {
+function EditListItemPopUp({ children }: { children: ReactNode }) {
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>

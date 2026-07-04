@@ -4,10 +4,10 @@ import BoardListItem from "./BoardListItem";
 
 import { useUserStore } from "@/app/store/useUserStore";
 import DeleteDropDown from "./DeleteDropDown";
-import { Board, useBoardStore } from "@/app/store/useBoardStore";
-import { set } from "zod";
+import { Board } from "@/app/types/board";
 import { useEffect } from "react";
 import CreateBoard from "./CreateBoard/CreateBoard";
+import { useBoardStore } from "@/app/store/useBoardStore";
 
 export interface IBoardList {
   title: string;

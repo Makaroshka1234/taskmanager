@@ -26,9 +26,12 @@ model User{
   password String
   boards Board[] 
   comments TaskComment[]
+  invites Invite[] @relation("SentInvites")
+
 
 memberships BoardMember[]
 @@unique([id, email])
+
 created_at DateTime @default(now())
 updated_at DateTime @updatedAt 
 }
@@ -39,24 +42,24 @@ creator User @relation(fields: [creatorId], references: [id])
 creatorId String
 members BoardMember[]
 boardLists BoardList[]
+invites Invite[]
 created_at DateTime @default(now())
 backgroundType String @default("COLOR")
 uploadedImages     String[]  @default([])
 backgroundImageUrl String?
 boardColor String?
-  
+
 } 
 
 model BoardMember{
   id String @id @default(uuid())
   userId String
   boardId String
-  role MemberRole
+
+ role MemberRole
  user User @relation(fields: [userId],references: [id])
  board Board @relation(fields: [boardId],references: [id])
  
-
-
 created_at DateTime @default(now())
 
 }
@@ -68,6 +71,7 @@ tasks Task[]
 boardId String
 created_at DateTime @default(now())
 board Board @relation(fields: [boardId],references: [id])
+
 
 }
 model Task{
@@ -94,4 +98,18 @@ task Task @relation(fields: [taskId],references: [id])
 created_at DateTime @default(now())
 updated_at DateTime @updatedAt 
 
+}
+model Invite {
+  id         String   @id @default(uuid())
+  email      String   
+  boardId    String   
+  board      Board    @relation(fields: [boardId], references: [id])
+  
+  
+  senderId   String
+  sender     User     @relation("SentInvites", fields: [senderId], references: [id])
+  
+  role       String   @default("MEMBER")
+  status     String   @default("PENDING")
+  createdAt  DateTime @default(now())
 }

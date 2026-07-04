@@ -5,6 +5,11 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-board-header-bg: var(--bg-boardheader-primary);
+  --color-board-button-bg: var(--bg-btn-primary);
+  --color-theme-text: var(--text-primary);
+  --color-theme-accent: var(--accent);
+  --color-theme-card: var(--card-bg);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -49,6 +54,12 @@
 }
 
 :root {
+  --bg-btn-primary: rgb(0, 0, 0);
+  --bg-boardheader-primary: lab(90.952 -0.0000596046 0);
+
+  /* якщо плануєш динамічно міняти — додай дефолтні значення */
+  --text-primary: oklch(0.145 0 0);
+  --card-bg: rgba(0, 0, 0, 0.05);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -81,6 +92,8 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --bg-btn-primary: rgb(0, 0, 0);
+  --bg-boardheader-primary: lab(33.41% 24.93 -59.82);
 }
 
 .dark {

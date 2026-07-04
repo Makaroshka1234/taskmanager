@@ -33,7 +33,7 @@ function Res() {
         className="  rounded-lg border flex-1  w-full"
         id="main-panel-group"
       >
-        <ResizablePanel id="sidebar-panel" defaultSize="25%" minSize="30%">
+        <ResizablePanel id="sidebar-panel" defaultSize="50%" minSize="30%">
           <div
             className="flex h-full  p-6"
             onDoubleClick={(e) => e.stopPropagation()}

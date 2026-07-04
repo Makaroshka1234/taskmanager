@@ -421,7 +421,7 @@ export const useBoardStore = create<BoardState>()(
                     task.id === taskId
                       ? {
                           ...task,
-                          // Додаємо новий коментар у масив (якщо його не було, створюємо масив)
+
                           comments: [...(task.comments || []), newComment],
                         }
                       : task,

@@ -6,7 +6,7 @@ import {
 } from "@/schadComponents/ui/card";
 
 import AddTaskListItem from "./AddTaskListItem";
-import DeleteDropDown from "../BoardList/DeleteDropDown";
+import DeleteDropDown from "../../BoardList/DeleteDropDown";
 
 import TaskListItem from "./TaskListItem";
 import { Task } from "@/app/types/board";
@@ -26,16 +26,19 @@ function TaskList(props: BoardList) {
         <DeleteDropDown listId={id} />
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
-        {tasks?.map((task) => (
-          <TaskListItem
-            key={task.id}
-            taskId={task.id}
-            title={task.title}
-            priority={task.priority}
-            taskListId={id}
-            completed={task.completed}
-          />
-        ))}
+        <ul className="flex flex-col gap-3 max-h-[150px] overflow-y-auto py-2 ">
+          {tasks?.map((task) => (
+            <TaskListItem
+              key={task.id}
+              taskId={task.id}
+              title={task.title}
+              priority={task.priority}
+              taskListId={id}
+              completed={task.completed}
+            />
+          ))}
+        </ul>
+
         <AddTaskListItem boardListId={id} />
       </CardContent>
     </Card>

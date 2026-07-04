@@ -26,7 +26,7 @@ import {
   FieldTitle,
 } from "@/schadComponents/ui/field";
 
-import PriorityList from "../PriorityList/PriorityList";
+import PriorityList from "../../PriorityList/PriorityList";
 
 import { createTaskSchema } from "@/app/schemas/createtask.schema";
 import { z } from "zod";

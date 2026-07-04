@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useUserStore } from "./store/useUserStore";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { Toaster } from "@/schadComponents/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -45,9 +46,12 @@ export default function RootLayout({
         inter.variable,
       )}
     >
-      <body className="min-h-screen flex flex-col">
+      <body className="min-h-screen h-full flex flex-col">
         <Header />
-        <main className="flex-1 flex flex-col overflow-hidden">{children}</main>
+        <main className="flex-1 flex flex-col h-full overflow-hidden">
+          {children}
+        </main>
+        <Toaster />
       </body>
     </html>
   );

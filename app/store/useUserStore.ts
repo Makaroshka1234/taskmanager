@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 import { apiFetch } from "../utils/apiFetch";
-import { Board } from "./useBoardStore";
+import { Board } from "../types/board";
 
 export interface IUser {
   email: string;
@@ -13,7 +13,7 @@ export interface IUser {
 interface AuthState {
   user: IUser | null;
   isLoading: boolean;
-  // Екшени
+
   initAuth: () => Promise<void>;
   clearUser: () => void;
   setUser: (user: IUser | null) => void;
@@ -57,3 +57,5 @@ export const useUserStore = create<AuthState>()(
     { name: "UserStore" }, // Назва для Redux DevTools
   ),
 );
+
+export const useUser = () => useUserStore((state) => state.user);

@@ -1,12 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 import BoardList from "@/app/components/BoardList/BoardList";
-import { useUserStore } from "../store/useUserStore";
+import { useUserStore } from "@/app/store/useUserStore";
 
 function ProfilePage() {
-  const router = useRouter();
   const { user, isLoading } = useUserStore();
 
   return (
