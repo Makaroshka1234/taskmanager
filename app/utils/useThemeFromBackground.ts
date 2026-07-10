@@ -39,6 +39,10 @@ interface UseThemeFromBackgroundParams {
   backgroundColor?: string | null;
 }
 
+type testType = {
+  name: string;
+};
+
 export function useThemeFromBackground({
   backgroundType,
   backgroundImageUrl,
