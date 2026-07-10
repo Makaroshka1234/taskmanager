@@ -42,7 +42,9 @@ interface UseThemeFromBackgroundParams {
 type testType = {
   name: string;
 };
-
+type Second = {
+  name: string;
+};
 export function useThemeFromBackground({
   backgroundType,
   backgroundImageUrl,
